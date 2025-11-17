@@ -4,3 +4,7 @@ sqlmodel
 ortools
 python-dotenv
 httpx
+passlib[bcrypt]
+bcrypt==4.0.1
+python-jose[cryptography]
+python-multipart
