@@ -229,8 +229,34 @@
       
       // Inicializar Mapa si no existe
       if (!map) {
-        map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v11', center: [-69.97, -15.84], zoom: 12 });
+        // Usamos 'streets-v12' que es más moderno
+        map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v12', center: [-69.97, -15.84], zoom: 12 });
+        
         map.on('load', () => {
+             // 1. AGREGAR CAPA DE TRÁFICO
+             map.addSource('mapbox-traffic', {
+               type: 'vector',
+               url: 'mapbox://mapbox.mapbox-traffic-v1'
+             });
+             map.addLayer({
+               'id': 'traffic',
+               'type': 'line',
+               'source': 'mapbox-traffic',
+               'source-layer': 'traffic',
+               'paint': {
+                 'line-width': 2,
+                 'line-color': [
+                   'case',
+                   ['==', 'low', ['get', 'congestion']], '#32CD32',      // Verde: fluido
+                   ['==', 'moderate', ['get', 'congestion']], '#FFA500', // Naranja: moderado
+                   ['==', 'heavy', ['get', 'congestion']], '#FF0000',    // Rojo: tráfico pesado
+                   ['==', 'severe', ['get', 'congestion']], '#8B0000',   // Rojo oscuro: colapso
+                   '#000000' // Negro: datos desconocidos
+                 ]
+               }
+             });
+
+             // 2. Cargar el resto de la app
              cargarParadasDisponibles();
              cargarRutasGuardadas();
              obtenerUbicacionAutomatica();
