@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Optimizador SaaS Puno</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -13,80 +13,79 @@
   <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
 
   <style>
-    body, html { height: 100%; margin: 0; font-family: sans-serif; background-color: #f8f9fa; }
+    body, html { height: 100%; margin: 0; font-family: sans-serif; background-color: #f8f9fa; overflow: hidden; }
     
     /* --- ESTILOS DE LOGIN --- */
     #auth-container { 
       height: 100%; display: flex; align-items: center; justify-content: center; 
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); position: relative; z-index: 2000;
     }
     .auth-card { 
-      background: white; padding: 2rem; border-radius: 12px; width: 100%; max-width: 400px; 
+      background: white; padding: 2rem; border-radius: 12px; width: 90%; max-width: 400px; 
       box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
     }
 
     /* --- ESTILOS DE LA APP (Ocultos al inicio) --- */
-    #app-container { display: none; height: 100%; width: 100%; }
+    #app-container { display: none; height: 100%; width: 100%; position: relative; }
     #map { height: 100%; width: 100%; position: absolute; top: 0; left: 0; }
-    .sidebar { 
-      position: absolute; top: 10px; left: 10px; width: 350px; 
-      background: rgba(255,255,255,0.95); padding: 15px; border-radius: 8px; 
-      z-index: 10; max-height: calc(100vh - 20px); overflow-y: auto; 
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
     
-    /* --- OTROS ESTILOS --- */
-    .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 20; display: none; justify-content: center; align-items: center; }
-    .itinerary-item-clickable { cursor: pointer; transition: background 0.2s; padding: 10px; border-bottom: 1px solid #eee; }
-    .itinerary-item-clickable:hover { background: #f1f1f1; }
-    .parada-item { display: flex; justify-content: space-between; padding: 8px 5px; border-bottom: 1px solid #f0f0f0; }
-    .geocode-result-item { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; }
-    .geocode-result-item:hover { background: #eee; }
-
-    /* --- SIDEBAR RESPONSIVO Y MINIMIZAR --- */
+    /* --- SIDEBAR RESPONSIVO --- */
     .sidebar { 
+      position: absolute; 
+      background: rgba(255,255,255,0.98); 
+      padding: 15px; 
+      z-index: 10; 
+      overflow-y: auto; 
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
       transition: transform 0.3s ease-in-out, opacity 0.3s;
+      
+      /* Estilo Desktop por defecto */
+      top: 10px; 
+      left: 10px; 
+      width: 350px; 
+      max-height: calc(100vh - 20px); 
+      border-radius: 8px; 
     }
 
-    /* Clase para ocultar sidebar (En PC se va a la izquierda) */
     .sidebar.hidden {
-      transform: translateX(-380px); /* Se mueve fuera de la pantalla */
+      transform: translateX(-370px);
       opacity: 0;
       pointer-events: none;
     }
 
-    /* Botón Flotante de Menú (Para abrir cuando está cerrado) */
     #btn-menu-float {
       position: absolute;
       top: 10px;
       left: 10px;
       z-index: 9;
-      display: none; /* Oculto por defecto */
+      display: none; 
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    /* --- ESTILO MÓVIL (< 768px) --- */
     @media (max-width: 768px) {
       .sidebar {
-        top: auto;       /* Ya no está arriba */
-        bottom: 0;       /* Se pega abajo */
-        left: 0;         /* Ocupa todo el ancho */
-        width: 100%;
-        max-height: 50vh; /* Máximo mitad de pantalla */
-        border-radius: 20px 20px 0 0; /* Redondeado solo arriba */
-        padding-bottom: 30px;
+        top: auto; bottom: 0; left: 0; width: 100%; max-height: 60vh; 
+        border-radius: 20px 20px 0 0; padding-bottom: 30px;
       }
-
-      /* En móvil, ocultar significa bajarlo */
-      .sidebar.hidden {
-        transform: translateY(100%); 
-      }
-      
-      #btn-menu-float {
-        top: 10px;
-        left: 10px;
-      }
+      .sidebar.hidden { transform: translateY(100%); }
+      #btn-menu-float { top: 10px; left: 10px; }
     }
+    
+    .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; display: none; justify-content: center; align-items: center; }
+    .itinerary-item-clickable { cursor: pointer; transition: background 0.2s; padding: 10px; border-bottom: 1px solid #eee; }
+    .itinerary-item-clickable:hover { background: #f1f1f1; }
+    .parada-item { display: flex; justify-content: space-between; padding: 8px 5px; border-bottom: 1px solid #f0f0f0; }
+    
+    /* Estilos mejorados para resultados de búsqueda */
+    .geocode-result-item { 
+      padding: 10px; 
+      border-bottom: 1px solid #eee; 
+      cursor: pointer; 
+      transition: background 0.2s;
+    }
+    .geocode-result-item:hover { background-color: #e9ecef; }
+    .geocode-result-item strong { color: #0d6efd; }
+    .crosshair-cursor { cursor: crosshair !important; }
   </style>
 </head>
 <body>
@@ -94,9 +93,7 @@
   <div id="auth-container">
     <div class="auth-card">
       <h3 class="text-center mb-4 text-primary fw-bold"><i class="bi bi-map-fill"></i> Ruta Puno SaaS</h3>
-      
       <div id="auth-error" class="alert alert-danger" style="display:none;"></div>
-
       <div id="login-form">
         <h5 class="mb-3">Iniciar Sesión</h5>
         <form onsubmit="handleLogin(event)">
@@ -106,7 +103,6 @@
         </form>
         <div class="text-center"><small>¿No tienes cuenta? <a href="#" onclick="toggleAuth('register')">Regístrate</a></small></div>
       </div>
-
       <div id="register-form" style="display:none;">
         <h5 class="mb-3">Crear Cuenta</h5>
         <form onsubmit="handleRegister(event)">
@@ -126,25 +122,29 @@
         <div class="spinner-border" role="status"></div><h4 class="ms-3">Cargando...</h4>
     </div>
 
-    <button id="btn-menu-float" class="btn btn-light btn-lg rounded-circle shadow" onclick="toggleSidebar()">
+    <button id="btn-menu-float" class="btn btn-light btn-lg rounded-circle" onclick="toggleSidebar()">
       <i class="bi bi-list"></i>
     </button>
-    
-   <div class="sidebar shadow" id="main-sidebar">
-      <h5 class="m-0 text-primary fw-bold">Planificador</h5>
+
+    <div class="sidebar shadow" id="main-sidebar">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="m-0 text-primary fw-bold">Planificador</h5>
         <div class="d-flex gap-2">
             <button onclick="toggleSidebar()" class="btn btn-sm btn-light text-secondary" title="Minimizar">
-                <i class="bi bi-chevron-down d-md-none"></i> 
-                <i class="bi bi-chevron-left d-none d-md-inline"></i> 
+                <i class="bi bi-chevron-down d-md-none"></i>
+                <i class="bi bi-chevron-left d-none d-md-inline"></i>
             </button>
             <button onclick="logout()" class="btn btn-outline-danger btn-sm" title="Salir">
                 <i class="bi bi-box-arrow-right"></i>
             </button>
         </div>
+      </div>
       <hr class="my-2">
       
       <h6>1. Inicio (GPS)</h6> <small id="start-coords" class="text-muted">Esperando GPS...</small>
-      <div id="pin-instruction" class="alert alert-info py-1 mt-2" style="display:none; font-size:0.9rem;">Haz clic en el mapa...</div>
+      <div id="pin-instruction" class="alert alert-info py-1 mt-2" style="display:none; font-size:0.9rem;">
+        <i class="bi bi-hand-index-thumb"></i> Haz clic en el mapa para fijar la ubicación...
+      </div>
 
       <h6 class="mt-3">Cargar Ruta</h6> 
       <select id="select-ruta-guardada" class="form-select form-select-sm"></select>
@@ -170,18 +170,47 @@
   </div>
 
   <div class="modal fade" id="paradaModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header"><h5 class="modal-title" id="modalTitle">Parada</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-header bg-light">
+      <h5 class="modal-title" id="modalTitle">📍 Nueva Parada</h5>
+      <button class="btn-close" data-bs-dismiss="modal"></button>
+    </div>
     <div class="modal-body">
       <form id="paradaForm">
         <input type="hidden" id="paradaId">
-        <div class="input-group mb-2"><input type="text" class="form-control" id="geocode-search-query" placeholder="Buscar lugar..."><button class="btn btn-outline-secondary" type="button" id="btn-geocode-search"><i class="bi bi-search"></i></button></div>
-        <div id="geocode-results" class="list-group mb-2"></div>
-        <input type="text" id="paradaNombre" class="form-control mb-2" placeholder="Nombre" required>
-        <button type="button" class="btn btn-secondary btn-sm w-100 mb-2" id="btn-pin-map"><i class="bi bi-geo-alt"></i> Marcar en Mapa</button>
-        <div class="row mb-2"><div class="col"><input type="number" step="any" id="paradaLat" class="form-control" placeholder="Lat" required></div><div class="col"><input type="number" step="any" id="paradaLng" class="form-control" placeholder="Lng" required></div></div>
-        <div class="row mb-2"><div class="col"><input type="time" id="paradaInicio" class="form-control" required></div><div class="col"><input type="time" id="paradaFin" class="form-control" required></div></div>
-        <input type="number" id="paradaServicio" class="form-control" value="30" placeholder="Mins">
-        <button type="submit" class="btn btn-primary w-100 mt-3">Guardar</button>
+        
+        <label class="form-label fw-bold">Buscar lugar en Puno:</label>
+        <div class="input-group mb-2">
+          <input type="text" class="form-control" id="geocode-search-query" placeholder="Ej: Plaza de Armas, Terminal...">
+          <button class="btn btn-primary" type="button" id="btn-geocode-search" onclick="handleGeocodeSearch()">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+        <div id="geocode-results" class="list-group mb-3 shadow-sm" style="max-height: 150px; overflow-y: auto;"></div>
+
+        <hr>
+        <label class="form-label fw-bold">Detalles:</label>
+        <input type="text" id="paradaNombre" class="form-control mb-2" placeholder="Nombre del lugar (se rellena solo)" required>
+        
+        <div class="d-grid mb-2">
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-pin-map">
+            <i class="bi bi-crosshair"></i> O selecciona en el mapa
+          </button>
+        </div>
+
+        <div class="row mb-2">
+          <div class="col"><input type="number" step="any" id="paradaLat" class="form-control form-control-sm bg-light" placeholder="Lat" readonly required></div>
+          <div class="col"><input type="number" step="any" id="paradaLng" class="form-control form-control-sm bg-light" placeholder="Lng" readonly required></div>
+        </div>
+        
+        <div class="row mb-2">
+          <div class="col"><label class="form-label" style="font-size:0.8rem">Apertura</label><input type="time" id="paradaInicio" class="form-control" required></div>
+          <div class="col"><label class="form-label" style="font-size:0.8rem">Cierre</label><input type="time" id="paradaFin" class="form-control" required></div>
+        </div>
+        
+        <label class="form-label" style="font-size:0.8rem">Tiempo visita (min)</label>
+        <input type="number" id="paradaServicio" class="form-control" value="30">
+        
+        <button type="submit" class="btn btn-success w-100 mt-3 fw-bold">Guardar Parada</button>
       </form>
     </div>
   </div></div></div>
@@ -189,21 +218,18 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // --- CONFIGURACIÓN ---
-    const API_URL = ""; // Cambiar a "" para producción
+    const API_URL = ""; 
     const MAPBOX_TOKEN = "pk.eyJ1IjoiamVmZjI2MTMyNiIsImEiOiJjbWh5aWgyeW4wMmVuMmtxYjVzb25xeHRhIn0.h8HOF9YxlXYJYnYATTX3Kg";
     
     mapboxgl.accessToken = MAPBOX_TOKEN;
     let map, userStartLocation, startMarker, paradasGlobal=[], rutasGlobal=[], paradasOptimizadasActuales=[], paradaModal, isPinningLocation=false;
-    let token = localStorage.getItem('token'); // Recuperar token guardado
+    let tempSearchMarker = null;
+    let token = localStorage.getItem('token');
 
     // --- INICIO ---
     document.addEventListener("DOMContentLoaded", () => {
-      if (token) {
-        iniciarApp();
-      } else {
-        document.getElementById('auth-container').style.display = 'flex';
-      }
-      // Event Listeners Globales
+      if (token) { iniciarApp(); } else { document.getElementById('auth-container').style.display = 'flex'; }
+      
       paradaModal = new bootstrap.Modal(document.getElementById('paradaModal'));
       document.getElementById("paradaForm").addEventListener("submit", handleGuardarParada);
       document.getElementById("btn-optimizar").addEventListener("click", handleOptimizar);
@@ -212,100 +238,62 @@
       document.getElementById("btn-geocode-search").addEventListener("click", handleGeocodeSearch);
       document.getElementById("select-ruta-guardada").addEventListener("change", handleCargarRuta);
       document.getElementById("btn-guardar-ruta").addEventListener("click", handleGuardarRuta);
+      
+      document.getElementById("geocode-search-query").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") { event.preventDefault(); handleGeocodeSearch(); }
+      });
     });
 
-    // --- FUNCIÓN PARA MINIMIZAR/ABRIR SIDEBAR ---
     function toggleSidebar() {
         const sidebar = document.getElementById('main-sidebar');
         const floatBtn = document.getElementById('btn-menu-float');
-        
-        // Alternar clase 'hidden'
         sidebar.classList.toggle('hidden');
-        
-        // Mostrar/Ocultar botón flotante
-        if (sidebar.classList.contains('hidden')) {
-            floatBtn.style.display = 'block';
-        } else {
-            floatBtn.style.display = 'none';
-        }
+        if (sidebar.classList.contains('hidden')) { floatBtn.style.display = 'block'; } else { floatBtn.style.display = 'none'; }
     }
+
     // --- AUTENTICACIÓN ---
     function toggleAuth(view) {
       document.getElementById('login-form').style.display = view === 'login' ? 'block' : 'none';
       document.getElementById('register-form').style.display = view === 'register' ? 'block' : 'none';
       document.getElementById('auth-error').style.display = 'none';
     }
-
     async function handleLogin(e) {
       e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const pass = document.getElementById('login-pass').value;
-      const formData = new FormData();
-      formData.append('username', email); formData.append('password', pass);
-
+      const email = document.getElementById('login-email').value; const pass = document.getElementById('login-pass').value;
+      const formData = new FormData(); formData.append('username', email); formData.append('password', pass);
       try {
         const res = await fetch(`${API_URL}/token`, { method: 'POST', body: formData });
-        if (!res.ok) throw new Error("Email o contraseña incorrectos");
-        const data = await res.json();
-        token = data.access_token;
-        localStorage.setItem('token', token);
-        iniciarApp();
-      } catch (err) { mostrarAuthError(err.message); }
+        if (!res.ok) throw new Error("Datos incorrectos");
+        const data = await res.json(); token = data.access_token; localStorage.setItem('token', token); iniciarApp();
+      } catch (e) { mostrarAuthError(e.message); }
     }
-
     async function handleRegister(e) {
       e.preventDefault();
-      const data = {
-        email: document.getElementById('reg-email').value,
-        password: document.getElementById('reg-pass').value,
-        nombre_completo: document.getElementById('reg-name').value
-      };
+      const data = { email: document.getElementById('reg-email').value, password: document.getElementById('reg-pass').value, nombre_completo: document.getElementById('reg-name').value };
       try {
-        const res = await fetch(`${API_URL}/register`, {
-          method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
-        });
+        const res = await fetch(`${API_URL}/register`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
         if (!res.ok) { const err = await res.json(); throw new Error(err.detail); }
-        alert("¡Cuenta creada! Por favor inicia sesión.");
-        toggleAuth('login');
-      } catch (err) { mostrarAuthError(err.message); }
+        alert("Cuenta creada. Inicia sesión."); toggleAuth('login');
+      } catch (e) { mostrarAuthError(e.message); }
     }
-
-    function logout() {
-      localStorage.removeItem('token');
-      location.reload();
-    }
-
-    function mostrarAuthError(msg) {
-        const el = document.getElementById('auth-error');
-        el.innerText = msg; el.style.display = 'block';
-    }
-
-    // --- FUNCIÓN API SEGURA (Wrapper) ---
+    function logout() { localStorage.removeItem('token'); location.reload(); }
+    function mostrarAuthError(msg) { const el = document.getElementById('auth-error'); el.innerText = msg; el.style.display = 'block'; }
     async function apiFetch(endpoint, options = {}) {
-      if (!options.headers) options.headers = {};
-      options.headers['Authorization'] = `Bearer ${token}`; // ¡AQUÍ VA LA LLAVE!
-      
-      const res = await fetch(`${API_URL}${endpoint}`, options);
-      if (res.status === 401) { logout(); } // Si el token vence, sacar al usuario
-      return res;
+      if (!options.headers) options.headers = {}; options.headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch(`${API_URL}${endpoint}`, options); if (res.status === 401) logout(); return res;
     }
 
-    // --- LÓGICA DE LA APP ---
+    // --- LÓGICA APP ---
     function iniciarApp() {
       document.getElementById('auth-container').style.display = 'none';
       document.getElementById('app-container').style.display = 'block';
-      
-      // Inicializar Mapa si no existe
       if (!map) {
-        // Usamos 'streets-v12' que es más moderno
+        // Usamos 'streets-v12' que es más moderno y soporta tráfico
         map = new mapboxgl.Map({ container: 'map', style: 'mapbox://styles/mapbox/streets-v12', center: [-69.97, -15.84], zoom: 12 });
         
         map.on('load', () => {
-             // 1. AGREGAR CAPA DE TRÁFICO
-             map.addSource('mapbox-traffic', {
-               type: 'vector',
-               url: 'mapbox://mapbox.mapbox-traffic-v1'
-             });
+             // --- CAPA DE TRÁFICO ---
+             map.addSource('mapbox-traffic', { type: 'vector', url: 'mapbox://mapbox.mapbox-traffic-v1' });
              map.addLayer({
                'id': 'traffic',
                'type': 'line',
@@ -315,227 +303,108 @@
                  'line-width': 2,
                  'line-color': [
                    'case',
-                   ['==', 'low', ['get', 'congestion']], '#32CD32',      // Verde: fluido
-                   ['==', 'moderate', ['get', 'congestion']], '#FFA500', // Naranja: moderado
-                   ['==', 'heavy', ['get', 'congestion']], '#FF0000',    // Rojo: tráfico pesado
-                   ['==', 'severe', ['get', 'congestion']], '#8B0000',   // Rojo oscuro: colapso
-                   '#000000' // Negro: datos desconocidos
+                   ['==', 'low', ['get', 'congestion']], '#32CD32',      // Verde
+                   ['==', 'moderate', ['get', 'congestion']], '#FFA500', // Naranja
+                   ['==', 'heavy', ['get', 'congestion']], '#FF0000',    // Rojo
+                   ['==', 'severe', ['get', 'congestion']], '#8B0000',   // Rojo oscuro
+                   '#000000'
                  ]
                }
              });
 
-             // 2. Cargar el resto de la app
-             cargarParadasDisponibles();
-             cargarRutasGuardadas();
-             obtenerUbicacionAutomatica();
+             cargarParadasDisponibles(); cargarRutasGuardadas(); obtenerUbicacionAutomatica();
         });
         map.on('click', handleMapClick);
       }
     }
 
-    // --- CRUD PARADAS (Usando apiFetch) ---
+    // --- CRUD Y MAPA (Sin cambios lógicos) ---
     async function cargarParadasDisponibles() {
       try {
-        const res = await apiFetch('/paradas/');
-        paradasGlobal = await res.json();
-        const container = document.getElementById("lista-paradas");
-        container.innerHTML = "";
+        const res = await apiFetch('/paradas/'); paradasGlobal = await res.json();
+        const container = document.getElementById("lista-paradas"); container.innerHTML = "";
         if (paradasGlobal.length === 0) { container.innerHTML = '<small class="text-muted">Sin destinos.</small>'; return; }
-        
         paradasGlobal.forEach(p => {
-          container.innerHTML += `
-            <div class="parada-item">
-              <div class="form-check"><input class="form-check-input parada-checkbox" type="checkbox" value="${p.id}" id="parada-${p.id}"><label class="form-check-label" for="parada-${p.id}">${p.nombre}</label></div>
-              <div class="btn-group btn-group-sm">
-                <button class="btn btn-outline-secondary" onclick="abrirModalEditarParada(${p.id})"><i class="bi bi-pencil-fill"></i></button>
-                <button class="btn btn-outline-danger" onclick="handleBorrarParada(${p.id}, '${p.nombre}')"><i class="bi bi-trash-fill"></i></button>
-              </div>
-            </div>`;
+          container.innerHTML += `<div class="parada-item"><div class="form-check"><input class="form-check-input parada-checkbox" type="checkbox" value="${p.id}" id="parada-${p.id}"><label class="form-check-label" for="parada-${p.id}">${p.nombre}</label></div><div class="btn-group btn-group-sm"><button class="btn btn-outline-secondary" onclick="abrirModalEditarParada(${p.id})"><i class="bi bi-pencil-fill"></i></button><button class="btn btn-outline-danger" onclick="handleBorrarParada(${p.id}, '${p.nombre}')"><i class="bi bi-trash-fill"></i></button></div></div>`;
         });
-      } catch (e) { console.error(e); }
+      } catch (e) {}
     }
-
     async function handleGuardarParada(e) {
       e.preventDefault();
       const pid = document.getElementById("paradaId").value;
-      const data = {
-        nombre: document.getElementById("paradaNombre").value,
-        lat: parseFloat(document.getElementById("paradaLat").value),
-        lng: parseFloat(document.getElementById("paradaLng").value),
-        ventana_inicio: document.getElementById("paradaInicio").value + ":00",
-        ventana_fin: document.getElementById("paradaFin").value + ":00",
-        tiempo_servicio_min: parseInt(document.getElementById("paradaServicio").value)
-      };
-      
+      const data = { nombre: document.getElementById("paradaNombre").value, lat: parseFloat(document.getElementById("paradaLat").value), lng: parseFloat(document.getElementById("paradaLng").value), ventana_inicio: document.getElementById("paradaInicio").value + ":00", ventana_fin: document.getElementById("paradaFin").value + ":00", tiempo_servicio_min: parseInt(document.getElementById("paradaServicio").value) };
       try {
-        let url = '/paradas/', method = 'POST';
-        if (pid) { url = `/paradas/${pid}`; method = 'PATCH'; }
-        
-        const res = await apiFetch(url, {
-            method: method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
-        });
-        if (!res.ok) throw new Error("Error al guardar");
+        let url = '/paradas/', method = 'POST'; if (pid) { url = `/paradas/${pid}`; method = 'PATCH'; }
+        const res = await apiFetch(url, { method: method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+        if (!res.ok) throw new Error("Error"); 
+        if(tempSearchMarker) { tempSearchMarker.remove(); tempSearchMarker = null; }
         paradaModal.hide(); cargarParadasDisponibles();
       } catch(err) { alert(err.message); }
     }
+    async function handleBorrarParada(id, n) { if(!confirm("¿Borrar?")) return; await apiFetch(`/paradas/${id}`, { method: 'DELETE' }); cargarParadasDisponibles(); }
+    async function cargarRutasGuardadas() { const res = await apiFetch('/rutas/'); rutasGlobal = await res.json(); const s = document.getElementById('select-ruta-guardada'); s.innerHTML = '<option value="">-- Mis Rutas --</option>'; rutasGlobal.forEach(r => s.innerHTML += `<option value="${r.id}">${r.nombre}</option>`); }
+    async function handleGuardarRuta() { const n = prompt("Nombre:"); if(!n) return; try { const res = await apiFetch('/rutas/', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ nombre: n, parada_ids: paradasOptimizadasActuales }) }); if(res.ok) { alert("Guardada"); cargarRutasGuardadas(); } } catch(e) { alert("Error"); } }
+    function handleCargarRuta(e) { const rid = parseInt(e.target.value); const r = rutasGlobal.find(x => x.id === rid); if(!r) return; limpiarPlan(false); r.paradas.forEach(p => { const c = document.getElementById(`parada-${p.id}`); if(c) c.checked = true; }); }
     
-    async function handleBorrarParada(id, nombre) {
-        if(!confirm("¿Borrar " + nombre + "?")) return;
-        await apiFetch(`/paradas/${id}`, { method: 'DELETE' });
-        cargarParadasDisponibles();
-    }
-
-    // --- RUTAS GUARDADAS ---
-    async function cargarRutasGuardadas() {
-      const res = await apiFetch('/rutas/');
-      rutasGlobal = await res.json();
-      const sel = document.getElementById('select-ruta-guardada');
-      sel.innerHTML = '<option value="">-- Mis Rutas --</option>';
-      rutasGlobal.forEach(r => sel.innerHTML += `<option value="${r.id}">${r.nombre}</option>`);
-    }
-
-    async function handleGuardarRuta() {
-        const nombre = prompt("Nombre de la ruta:");
-        if(!nombre) return;
-        try {
-            const res = await apiFetch('/rutas/', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ nombre: nombre, parada_ids: paradasOptimizadasActuales })
-            });
-            if(res.ok) { alert("Guardada"); cargarRutasGuardadas(); }
-        } catch(e) { alert("Error"); }
-    }
-
-    function handleCargarRuta(e) {
-        const rid = parseInt(e.target.value);
-        const ruta = rutasGlobal.find(r => r.id === rid);
-        if(!ruta) return;
-        limpiarPlan(false);
-        ruta.paradas.forEach(p => {
-            const chk = document.getElementById(`parada-${p.id}`);
-            if(chk) chk.checked = true;
-        });
-    }
-
-    // --- OPTIMIZACIÓN ---
     async function handleOptimizar() {
       if(!userStartLocation) { alert("Sin ubicación"); return; }
-      const seleccionadas = Array.from(document.querySelectorAll(".parada-checkbox:checked")).map(c => parseInt(c.value));
-      if(seleccionadas.length === 0) return;
-      
-      document.getElementById("loading").style.display = "flex";
-      limpiarPlan(false);
-      paradasOptimizadasActuales = seleccionadas;
-
+      const s = Array.from(document.querySelectorAll(".parada-checkbox:checked")).map(c => parseInt(c.value));
+      if(s.length === 0) return;
+      document.getElementById("loading").style.display = "flex"; limpiarPlan(false); paradasOptimizadasActuales = s;
       try {
-        const res = await apiFetch('/api/v2/optimizar-ruta', {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ start_lat: userStartLocation.lat, start_lng: userStartLocation.lng, parada_ids: seleccionadas })
-        });
-        const data = await res.json();
-        if(!res.ok) throw new Error(data.detail);
-        
-        mostrarItinerario(data);
-        document.getElementById("btn-guardar-ruta").style.display = "block";
-        dibujarRutaEnMapa(data.stops.map(s => s.parada));
-      } catch(e) {
-          document.getElementById("itinerario-error").innerText = e.message;
-          document.getElementById("itinerario-error").style.display = "block";
-      } finally { document.getElementById("loading").style.display = "none"; }
+        const res = await apiFetch('/api/v2/optimizar-ruta', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ start_lat: userStartLocation.lat, start_lng: userStartLocation.lng, parada_ids: s }) });
+        const data = await res.json(); if(!res.ok) throw new Error(data.detail);
+        mostrarItinerario(data); document.getElementById("btn-guardar-ruta").style.display = "block"; dibujarRutaEnMapa(data.stops.map(x => x.parada));
+      } catch(e) { document.getElementById("itinerario-error").innerText = e.message; document.getElementById("itinerario-error").style.display = "block"; } finally { document.getElementById("loading").style.display = "none"; }
     }
 
-    // --- UTILIDADES DE MAPA (Similares a antes) ---
-    // (Incluyo las versiones abreviadas para que funcione todo en un solo bloque)
     function handleMapClick(e) {
-        if (isPinningLocation) {
-            document.getElementById("paradaLat").value = e.lngLat.lat.toFixed(6);
-            document.getElementById("paradaLng").value = e.lngLat.lng.toFixed(6);
-            isPinningLocation = false; document.getElementById("pin-instruction").style.display = "none";
-            map.getCanvas().classList.remove('crosshair-cursor'); paradaModal.show();
-        } else if (!userStartLocation) {
-            userStartLocation = e.lngLat;
-            if (startMarker) startMarker.setLngLat(e.lngLat);
-            else startMarker = new mapboxgl.Marker({color:"green"}).setLngLat(e.lngLat).addTo(map);
-            document.getElementById("start-coords").innerText = "Ubicación Manual";
+        if (isPinningLocation) { 
+            document.getElementById("paradaLat").value = e.lngLat.lat.toFixed(6); 
+            document.getElementById("paradaLng").value = e.lngLat.lng.toFixed(6); 
+            isPinningLocation = false; document.getElementById("pin-instruction").style.display = "none"; 
+            map.getCanvas().classList.remove('crosshair-cursor'); paradaModal.show(); 
+        } else if (!userStartLocation) { 
+            userStartLocation = e.lngLat; 
+            if (startMarker) startMarker.setLngLat(e.lngLat); 
+            else startMarker = new mapboxgl.Marker({color:"green"}).setLngLat(e.lngLat).addTo(map); 
+            document.getElementById("start-coords").innerText = "Ubicación Manual"; 
         }
     }
-    function obtenerUbicacionAutomatica() {
-        if(!navigator.geolocation) return;
-        navigator.geolocation.watchPosition(pos => {
-            const {latitude: lat, longitude: lng} = pos.coords;
-            userStartLocation = {lat, lng};
-            document.getElementById("start-coords").innerText = "GPS Activo";
-            if(startMarker) startMarker.setLngLat([lng, lat]);
-            else { startMarker = new mapboxgl.Marker({color:"green"}).setLngLat([lng, lat]).addTo(map); map.flyTo({center:[lng, lat], zoom:14}); }
-        });
-    }
-    function abrirModalNuevaParada() {
-        document.getElementById("paradaForm").reset(); document.getElementById("paradaId").value="";
-        document.getElementById("geocode-results").innerHTML=""; paradaModal.show();
-    }
-    function abrirModalEditarParada(id) {
-        const p = paradasGlobal.find(x => x.id === id); if(!p) return;
-        document.getElementById("paradaId").value = p.id;
-        document.getElementById("paradaNombre").value = p.nombre;
-        document.getElementById("paradaLat").value = p.lat; document.getElementById("paradaLng").value = p.lng;
-        document.getElementById("paradaInicio").value = p.ventana_inicio; document.getElementById("paradaFin").value = p.ventana_fin;
-        paradaModal.show();
-    }
+    function obtenerUbicacionAutomatica() { if(!navigator.geolocation) return; navigator.geolocation.watchPosition(pos => { const {latitude: lat, longitude: lng} = pos.coords; userStartLocation = {lat, lng}; document.getElementById("start-coords").innerText = "GPS Activo"; if(startMarker) startMarker.setLngLat([lng, lat]); else { startMarker = new mapboxgl.Marker({color:"green"}).setLngLat([lng, lat]).addTo(map); map.flyTo({center:[lng, lat], zoom:14}); } }); }
+    function abrirModalNuevaParada() { document.getElementById("paradaForm").reset(); document.getElementById("paradaId").value=""; document.getElementById("geocode-results").innerHTML=""; paradaModal.show(); }
+    function abrirModalEditarParada(id) { const p = paradasGlobal.find(x => x.id === id); if(!p) return; document.getElementById("paradaId").value = p.id; document.getElementById("paradaNombre").value = p.nombre; document.getElementById("paradaLat").value = p.lat; document.getElementById("paradaLng").value = p.lng; document.getElementById("paradaInicio").value = p.ventana_inicio; document.getElementById("paradaFin").value = p.ventana_fin; paradaModal.show(); }
     function startPinningLocation() { isPinningLocation=true; paradaModal.hide(); document.getElementById("pin-instruction").style.display="block"; map.getCanvas().classList.add('crosshair-cursor'); }
     
-    // (Búsqueda Geocoding - Igual que antes, usando fetch directo)
     async function handleGeocodeSearch() {
-        const q = document.getElementById("geocode-search-query").value; if(!q) return;
-        const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&country=PE&limit=5`);
-        const data = await res.json();
-        document.getElementById("geocode-results").innerHTML = data.features.map(f => 
-            `<div class="geocode-result-item" onclick="selectGeo(${f.center[0]},${f.center[1]},'${f.place_name.replace(/'/g,"")}')"><b>${f.text}</b><br><small>${f.place_name}</small></div>`
-        ).join('');
-    }
-    function selectGeo(lng, lat, name) {
-        document.getElementById("paradaNombre").value = name;
-        document.getElementById("paradaLat").value = lat; document.getElementById("paradaLng").value = lng;
-        document.getElementById("geocode-results").innerHTML="";
-    }
-    
-    function limpiarPlan(chk=true) {
-        // Limpiar mapa, lista, etc. (Implementación estándar)
-        if(map.getSource('route')) { map.removeLayer('route'); map.removeSource('route'); }
-        document.querySelectorAll('.marker-p').forEach(m => m.remove()); // Asumiendo clase marker-p
-        document.getElementById("itinerario-lista").innerHTML="";
-        document.getElementById("btn-guardar-ruta").style.display="none";
-        if(chk) { document.querySelectorAll(".parada-checkbox").forEach(c => c.checked=false); document.getElementById("select-ruta-guardada").value=""; }
+        const q = document.getElementById("geocode-search-query").value; if (!q) return;
+        const resultsContainer = document.getElementById("geocode-results"); resultsContainer.innerHTML = '<div class="text-muted p-2">Buscando...</div>';
+        try {
+            const bbox = "-71.0,-16.5,-68.5,-13.0"; 
+            const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q)}.json?access_token=${MAPBOX_TOKEN}&country=PE&bbox=${bbox}&types=poi,address,place,neighborhood&limit=5`;
+            const response = await fetch(url); const data = await response.json();
+            if (data.features && data.features.length > 0) {
+                resultsContainer.innerHTML = data.features.map(f => {
+                    const safeName = f.text.replace(/'/g, "\\'"); const safeAddress = (f.place_name || "").replace(/'/g, "\\'");
+                    return `<div class="geocode-result-item" onclick="selectGeocodeResult(${f.center[0]}, ${f.center[1]}, '${safeName}', '${safeAddress}')"><strong>${f.text}</strong><br><small>${f.properties.address || f.context?.map(c => c.text).join(', ') || ""}</small></div>`;
+                }).join('');
+            } else { resultsContainer.innerHTML = '<div class="text-muted p-2">Sin resultados.</div>'; }
+        } catch (error) { resultsContainer.innerHTML = '<div class="text-danger p-2">Error.</div>'; }
     }
 
+    function selectGeocodeResult(lng, lat, shortName, fullName) {
+        document.getElementById("paradaNombre").value = shortName;
+        document.getElementById("paradaLat").value = lat.toFixed(6); document.getElementById("paradaLng").value = lng.toFixed(6);
+        document.getElementById("geocode-results").innerHTML = ""; document.getElementById("geocode-search-query").value = "";
+        map.flyTo({ center: [lng, lat], zoom: 16 });
+        if (tempSearchMarker) tempSearchMarker.remove();
+        tempSearchMarker = new mapboxgl.Marker({ color: "#FFAA00" }).setLngLat([lng, lat]).setPopup(new mapboxgl.Popup().setText(shortName)).addTo(map).togglePopup();
+    }
+
+    function limpiarPlan(chk=true) { if(map.getSource('route')) { map.removeLayer('route'); map.removeSource('route'); } document.querySelectorAll('.marker-p').forEach(m => m.remove()); document.getElementById("itinerario-lista").innerHTML=""; document.getElementById("btn-guardar-ruta").style.display="none"; if(chk) { document.querySelectorAll(".parada-checkbox").forEach(c => c.checked=false); document.getElementById("select-ruta-guardada").value=""; } }
     let markers = [];
-    async function dibujarRutaEnMapa(paradas) {
-        markers.forEach(m => m.remove()); markers=[];
-        if(map.getSource('route')) { map.removeLayer('route'); map.removeSource('route'); }
-        
-        paradas.forEach((p, i) => {
-            if(i===0) return;
-            const el = document.createElement('div'); el.className = 'marker-p'; // Truco para borrarlos luego
-            const m = new mapboxgl.Marker({color:"red"}).setLngLat([p.lng, p.lat]).setPopup(new mapboxgl.Popup().setText(p.nombre)).addTo(map);
-            markers.push(m);
-        });
-
-        const coords = paradas.map(p => `${p.lng},${p.lat}`).join(';');
-        const res = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${coords}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`);
-        const data = await res.json();
-        
-        map.addSource('route', {type: 'geojson', data: {type: 'Feature', geometry: data.routes[0].geometry}});
-        map.addLayer({id: 'route', type: 'line', source: 'route', layout: {'line-join': 'round', 'line-cap': 'round'}, paint: {'line-color': '#3887be', 'line-width': 5}});
-        
-        const bounds = new mapboxgl.LngLatBounds();
-        paradas.forEach(p => bounds.extend([p.lng, p.lat]));
-        map.fitBounds(bounds, {padding: 50});
-    }
-
-    function mostrarItinerario(data) {
-         document.getElementById("itinerario-lista").innerHTML = data.stops.map((s, i) => 
-            `<div class="itinerary-item"><b>${i}. ${s.parada.nombre}</b><br><small>Llegada: ${s.arrival_time}</small></div>`
-         ).join('');
-    }
+    async function dibujarRutaEnMapa(paradas) { markers.forEach(m => m.remove()); markers=[]; if(map.getSource('route')) { map.removeLayer('route'); map.removeSource('route'); } paradas.forEach((p, i) => { if(i===0) return; const el = document.createElement('div'); el.className = 'marker-p'; const m = new mapboxgl.Marker({color:"red"}).setLngLat([p.lng, p.lat]).setPopup(new mapboxgl.Popup().setText(p.nombre)).addTo(map); markers.push(m); }); const coords = paradas.map(p => `${p.lng},${p.lat}`).join(';'); const res = await fetch(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${coords}?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`); const data = await res.json(); map.addSource('route', {type: 'geojson', data: {type: 'Feature', geometry: data.routes[0].geometry}}); map.addLayer({id: 'route', type: 'line', source: 'route', layout: {'line-join': 'round', 'line-cap': 'round'}, paint: {'line-color': '#3887be', 'line-width': 5}}); const bounds = new mapboxgl.LngLatBounds(); paradas.forEach(p => bounds.extend([p.lng, p.lat])); map.fitBounds(bounds, {padding: 50}); }
+    function mostrarItinerario(data) { document.getElementById("itinerario-lista").innerHTML = data.stops.map((s, i) => `<div class="itinerary-item-clickable" onclick="map.flyTo({center:[${s.parada.lng},${s.parada.lat}],zoom:15})"><b>${i}. ${s.parada.nombre}</b><br><small>Llegada: ${s.arrival_time}</small></div>`).join(''); }
   </script>
 </body>
 </html>
