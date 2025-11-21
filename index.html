@@ -42,6 +42,51 @@
     .parada-item { display: flex; justify-content: space-between; padding: 8px 5px; border-bottom: 1px solid #f0f0f0; }
     .geocode-result-item { padding: 8px; cursor: pointer; border-bottom: 1px solid #eee; }
     .geocode-result-item:hover { background: #eee; }
+
+    /* --- SIDEBAR RESPONSIVO Y MINIMIZAR --- */
+    .sidebar { 
+      transition: transform 0.3s ease-in-out, opacity 0.3s;
+    }
+
+    /* Clase para ocultar sidebar (En PC se va a la izquierda) */
+    .sidebar.hidden {
+      transform: translateX(-380px); /* Se mueve fuera de la pantalla */
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Botón Flotante de Menú (Para abrir cuando está cerrado) */
+    #btn-menu-float {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 9;
+      display: none; /* Oculto por defecto */
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* --- ESTILO MÓVIL (< 768px) --- */
+    @media (max-width: 768px) {
+      .sidebar {
+        top: auto;       /* Ya no está arriba */
+        bottom: 0;       /* Se pega abajo */
+        left: 0;         /* Ocupa todo el ancho */
+        width: 100%;
+        max-height: 50vh; /* Máximo mitad de pantalla */
+        border-radius: 20px 20px 0 0; /* Redondeado solo arriba */
+        padding-bottom: 30px;
+      }
+
+      /* En móvil, ocultar significa bajarlo */
+      .sidebar.hidden {
+        transform: translateY(100%); 
+      }
+      
+      #btn-menu-float {
+        top: 10px;
+        left: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -81,13 +126,21 @@
         <div class="spinner-border" role="status"></div><h4 class="ms-3">Cargando...</h4>
     </div>
 
-    <div class="sidebar shadow">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h5 class="m-0 text-primary fw-bold">Planificador</h5>
-        <button onclick="logout()" class="btn btn-outline-danger btn-sm" title="Cerrar Sesión">
-            <i class="bi bi-box-arrow-right"></i> Salir
-        </button>
-      </div>
+    <button id="btn-menu-float" class="btn btn-light btn-lg rounded-circle shadow" onclick="toggleSidebar()">
+      <i class="bi bi-list"></i>
+    </button>
+    
+   <div class="sidebar shadow" id="main-sidebar">
+      <h5 class="m-0 text-primary fw-bold">Planificador</h5>
+        <div class="d-flex gap-2">
+            <button onclick="toggleSidebar()" class="btn btn-sm btn-light text-secondary" title="Minimizar">
+                <i class="bi bi-chevron-down d-md-none"></i> 
+                <i class="bi bi-chevron-left d-none d-md-inline"></i> 
+            </button>
+            <button onclick="logout()" class="btn btn-outline-danger btn-sm" title="Salir">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
       <hr class="my-2">
       
       <h6>1. Inicio (GPS)</h6> <small id="start-coords" class="text-muted">Esperando GPS...</small>
@@ -161,6 +214,21 @@
       document.getElementById("btn-guardar-ruta").addEventListener("click", handleGuardarRuta);
     });
 
+    // --- FUNCIÓN PARA MINIMIZAR/ABRIR SIDEBAR ---
+    function toggleSidebar() {
+        const sidebar = document.getElementById('main-sidebar');
+        const floatBtn = document.getElementById('btn-menu-float');
+        
+        // Alternar clase 'hidden'
+        sidebar.classList.toggle('hidden');
+        
+        // Mostrar/Ocultar botón flotante
+        if (sidebar.classList.contains('hidden')) {
+            floatBtn.style.display = 'block';
+        } else {
+            floatBtn.style.display = 'none';
+        }
+    }
     // --- AUTENTICACIÓN ---
     function toggleAuth(view) {
       document.getElementById('login-form').style.display = view === 'login' ? 'block' : 'none';
